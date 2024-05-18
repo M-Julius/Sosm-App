@@ -7,8 +7,7 @@ class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _ProfileScreenState createState() => _ProfileScreenState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
@@ -78,7 +77,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/login');
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/login', (route) => false);
               },
               child: const Text('Logout'),
             ),
