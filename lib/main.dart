@@ -4,6 +4,12 @@ import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
 
+/* UTS Pemrograman android
+- M. Julius Saputra - 411211062
+- Andika Guruh Topandi - 411211046
+- Dani Basse - 411211051
+*/
+
 void main() {
   runApp(const SocialMediaApp());
 }
