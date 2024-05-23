@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:social_media_app/models/post.dart';
+import 'package:social_media_app/widgets/post_widget.dart';
 
 class PostCard extends StatefulWidget {
   const PostCard({super.key});
@@ -9,7 +13,16 @@ class PostCard extends StatefulWidget {
 
 class _PostCardState extends State<PostCard> {
   final TextEditingController _textController = TextEditingController();
-  bool _isImageSelected = false;
+  XFile? _image;
+
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _image = image;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -22,50 +35,54 @@ class _PostCardState extends State<PostCard> {
             const Row(
               children: [
                 CircleAvatar(
-                  backgroundImage:
-                      AssetImage('assets/images/default_profile_picture.png'),
+                  backgroundImage: NetworkImage(
+                      'https://cdn3.iconfinder.com/data/icons/vector-icons-6/96/256-1024.png'),
                 ),
                 SizedBox(width: 8),
-                Text('Username'),
-                Spacer(),
+                Text('John Doe'),
+                // Spacer(),
               ],
             ),
+            _image != null
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: ClipRRect(
+                        borderRadius: const BorderRadius.all(Radius.circular(10)),
+                        child: Image.file(File(_image!.path))),
+                  )
+                : const SizedBox(),
             const SizedBox(height: 8),
             TextField(
               controller: _textController,
-              decoration: const InputDecoration(
-                hintText: 'What\'s on your mind?',
-                prefixIcon: Icon(Icons.text_fields),
-              ),
+              decoration: InputDecoration(
+                  hintText: 'What\'s on your mind?',
+                  suffixIcon: InkWell(
+                      onTap: _pickImage, child: const Icon(Icons.image))),
             ),
             const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton.icon(
-                  onPressed: () {
-                    // Add image selection logic here
-                    setState(() {
-                      _isImageSelected = true;
-                    });
-                  },
-                  icon: const Icon(Icons.image),
-                  label: const Text('Add Image'),
-                ),
-                if (_isImageSelected)
-                  Expanded(
-                    child: Image.asset('assets/images/selected_image.png'),
-                  ),
-              ],
-            ),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.post_add),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Post created'),
+                      ),
+                    );
+                    setState(() {
+                      _textController.clear();
+                      _image = null;
+                    });
+                  },
+                  icon: const Icon(Icons.send),
                   label: const Text('Post'),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -80,25 +97,28 @@ class TimelineScreen extends StatelessWidget {
   final List<Post> posts = [
     Post(
         username: 'John Doe',
-        profilePicture: 'https://cdn3.iconfinder.com/data/icons/vector-icons-6/96/256-1024.png',
+        profilePicture:
+            'https://cdn3.iconfinder.com/data/icons/vector-icons-6/96/256-1024.png',
         state: 'Active',
         content: 'This is my first post!',
-        // image:
-        //     'https://pixnio.com/free-images/2017/10/12/2017-10-12-09-01-56.jpg',
+        image:
+            'https://contentoo.com/wp-content/uploads/2023/04/Content-creation-V1-e1680617593807.png',
         time: '1 hours'),
     Post(
         username: 'Jane Doe',
-        profilePicture: 'https://cdn3.iconfinder.com/data/icons/vector-icons-6/96/256-1024.png',
+        profilePicture:
+            'https://cdn3.iconfinder.com/data/icons/vector-icons-6/96/256-1024.png',
         state: 'Inactive',
         content: 'This is my second post!',
         time: '7 hours'),
     Post(
         username: 'Bob Smith',
-        profilePicture: 'https://cdn3.iconfinder.com/data/icons/vector-icons-6/96/256-1024.png',
+        profilePicture:
+            'https://cdn3.iconfinder.com/data/icons/vector-icons-6/96/256-1024.png',
         state: 'Active',
         content: 'This is my third post!',
-        // image:
-        //     'https://pixnio.com/free-images/2017/10/12/2017-10-12-09-01-56.jpg',
+        image:
+            'https://contentoo.com/wp-content/uploads/2023/04/Content-creation-V1-e1680617593807.png',
         time: '7 hours'),
   ];
 
@@ -116,62 +136,7 @@ class TimelineScreen extends StatelessWidget {
             index--; // Adjust index to match posts list
             return Card(
               margin: const EdgeInsets.all(10),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundImage:
-                              AssetImage(posts[index].profilePicture),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(posts[index].username),
-                        const Spacer(),
-                        Text(posts[index].time),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(posts[index].content),
-                    if (posts[index].image != null)
-                      Image.network(posts[index].image!),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextButton(
-                          onPressed: () {},
-                          child: const Column(
-                            children: [
-                              Icon(Icons.thumb_up),
-                              Text('Like'),
-                            ],
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {},
-                          child: const Column(
-                            children: [
-                              Icon(Icons.comment),
-                              Text('Comment'),
-                            ],
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {},
-                          child: const Column(
-                            children: [
-                              Icon(Icons.share),
-                              Text('Share'),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              child: postWidget(posts[index], context, isDetail: false),
             );
           }
         },

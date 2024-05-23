@@ -30,9 +30,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Social Media App'),
+        title: const Text('Sosm App'),
       ),
-      body: _widgetOptions.elementAt(_selectedIndex),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

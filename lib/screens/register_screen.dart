@@ -29,6 +29,14 @@ class RegisterScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.pushReplacementNamed(context, '/home');
               },
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+                maximumSize: const Size.fromHeight(50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+              ),
               child: const Text('Register'),
             ),
           ],

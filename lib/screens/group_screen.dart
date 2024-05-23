@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:social_media_app/screens/chat_screen.dart';
 
 class GroupScreen extends StatelessWidget {
   final List<String> groups = ['Group 1', 'Group 2', 'Group 3'];
@@ -23,7 +24,13 @@ class GroupScreen extends StatelessWidget {
               subtitle: Text('${groups.length} members'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
-                // Navigate to group details screen
+                // Navigate to chat screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatScreen(username: groups[index]),
+                  ),
+                );
               },
             ),
           );

@@ -25,64 +25,157 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            CircleAvatar(
-              radius: 50,
-              backgroundImage:
-                  _image == null ? null : FileImage(File(_image!.path)),
-            ),
-            TextButton(
-              onPressed: _pickImage,
-              child: const Text('Change Profile Picture'),
-            ),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Column(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
                   children: [
-                    Text(
-                      'Total Followers',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    Text(
-                      '100',
-                      style: TextStyle(fontSize: 16),
-                    ),
+                    _image != null
+                        ? InkWell(
+                            onTap: _pickImage,
+                            child: CircleAvatar(
+                              radius: 50,
+                              backgroundImage: FileImage(File(_image!.path)),
+                            ),
+                          )
+                        : InkWell(
+                            onTap: _pickImage,
+                            child: const CircleAvatar(
+                              radius: 50,
+                              backgroundImage: NetworkImage(
+                                  'https://cdn3.iconfinder.com/data/icons/vector-icons-6/96/256-1024.png'),
+                            ),
+                          ),
+                    const SizedBox(width: 15),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        textDirection: TextDirection.ltr,
+                        children: [
+                          Text('John Doe', style: TextStyle(fontSize: 24)),
+                          Text(
+                            '''Helo, I am John Doe, Software Engineer''',
+                            style: TextStyle(fontSize: 16),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 3,
+                            textAlign: TextAlign.left,
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
-                Column(
+              ),
+              const SizedBox(height: 30),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Column(
+                    children: [
+                      Text(
+                        'Total Followers',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      Text(
+                        '100',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      Text(
+                        'Total Following',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      Text(
+                        '150',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              const Divider(),
+              const SizedBox(height: 20),
+              InkWell(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.post_add),
+                          SizedBox(width: 10),
+                          Text('Posted'),
+                        ],
+                      ),
+                      Icon(Icons.arrow_right, size: 30),
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Total Following',
-                      style: TextStyle(fontSize: 18),
+                    Row(
+                      children: [
+                        Icon(Icons.account_box),
+                        SizedBox(width: 10),
+                        Text('Account'),
+                      ],
                     ),
-                    Text(
-                      '150',
-                      style: TextStyle(fontSize: 16),
-                    ),
+                    Icon(Icons.arrow_right, size: 30),
                   ],
                 ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            const Text('User Name', style: TextStyle(fontSize: 24)),
-            const Text('Bio goes here...', style: TextStyle(fontSize: 16)),
-            const SizedBox(height: 20),
-            const Text(
-              'Email: user@example.com\nUsername: username\nAddress: 123 Main St',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamedAndRemoveUntil(
-                    context, '/login', (route) => false);
-              },
-              child: const Text('Logout'),
-            ),
-          ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.settings),
+                        SizedBox(width: 10),
+                        Text('Setting'),
+                      ],
+                    ),
+                    Icon(Icons.arrow_right, size: 30),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Divider(),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/', (route) => false);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                    maximumSize: const Size.fromHeight(50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                  ),
+                  child: const Text('Logout'),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );

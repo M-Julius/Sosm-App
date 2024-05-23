@@ -6,15 +6,20 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-        centerTitle: true,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            const SizedBox(height: 20),
+            // Text Logo Login App
+            const SizedBox(height: 100),
+            const Text(
+              'Sosm App',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 50),
             const TextField(
               decoration: InputDecoration(labelText: 'Email'),
             ),
@@ -37,10 +42,23 @@ class LoginScreen extends StatelessWidget {
               ),
               child: const Text('Login'),
             ),
-            TextButton(
+            const SizedBox(height: 20,),
+            ElevatedButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/register');
               },
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+                maximumSize: const Size.fromHeight(50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                side: const BorderSide(
+                  color: Colors.deepPurple,
+                  width: 1,
+                ),
+              ),
               child: const Text('Register'),
             ),
           ],
