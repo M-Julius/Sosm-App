@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/models/post.dart';
+import 'package:social_media_app/screens/chat_screen.dart';
 import 'package:social_media_app/widgets/post_widget.dart';
 
 class UserScreen extends StatefulWidget {
@@ -107,23 +108,47 @@ class _UserScreenState extends State<UserScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  
-                },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(50),
-                  maximumSize: const Size.fromHeight(50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: ElevatedButton.icon(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                    ),
+                    label: const Text('Follow'),
+                    icon: const Icon(Icons.add),
+                  ),
                 ),
-                label: const Text('Follow'),
-                icon: const Icon(Icons.add),
-              ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      // navigate to direct screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const ChatScreen(username: 'John Doe'),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                    ),
+                    label: const Text('Message'),
+                    icon: const Icon(Icons.messenger_outline),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             const Divider(),
