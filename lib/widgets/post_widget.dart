@@ -8,6 +8,7 @@ import 'package:social_media_app/models/comment.dart';
 import 'package:social_media_app/models/post.dart';
 import 'package:social_media_app/screens/comment_screen.dart';
 import 'package:social_media_app/screens/user_screen.dart';
+import 'package:share_plus/share_plus.dart';
 
 Widget postWidget(Post post, BuildContext context, {bool isDetail = false}) {
   return FutureBuilder<bool>(
@@ -82,7 +83,9 @@ Widget postWidget(Post post, BuildContext context, {bool isDetail = false}) {
                       children: [
                         TextButton.icon(
                           onPressed: () async {
-                            if (isLiked) {
+                            final isLikedPost = await DatabaseHelper()
+                                .isPostLikedByCurrentUser(post.id!);
+                            if (isLikedPost) {
                               await DatabaseHelper().unlikePost(post.id!);
                               post.likeCount--;
                             } else {
@@ -126,7 +129,10 @@ Widget postWidget(Post post, BuildContext context, {bool isDetail = false}) {
                               }),
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Share.share(post.content,
+                                subject: 'Look what I made!');
+                          },
                           child: const Icon(
                             Icons.share,
                             color: Colors.grey,

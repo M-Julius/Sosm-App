@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:social_media_app/helpers/database_helper.dart';
+import 'package:social_media_app/helpers/image.dart';
 import 'package:social_media_app/models/group_message.dart';
 import 'package:social_media_app/models/user.dart';
 
 class GroupChatScreen extends StatefulWidget {
   final int groupId;
+  final String groupName;
 
-  const GroupChatScreen({super.key, required this.groupId});
+  const GroupChatScreen(
+      {super.key, required this.groupId, required this.groupName});
 
   @override
   GroupChatScreenState createState() => GroupChatScreenState();
@@ -52,7 +55,7 @@ class GroupChatScreenState extends State<GroupChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Group Chat'),
+        title: Text('Group ${widget.groupName}'),
       ),
       body: Column(
         children: [
@@ -92,12 +95,47 @@ class GroupChatScreenState extends State<GroupChatScreen> {
                                 maxWidth:
                                     MediaQuery.of(context).size.width * 0.7,
                               ),
-                              child: Text(
-                                message.message,
-                                style: TextStyle(
-                                    color: isSentByMe
-                                        ? Colors.white
-                                        : Colors.black),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      FutureBuilder(
+                                          future: imageAvatar(message.sender),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return const CircularProgressIndicator();
+                                            } else if (snapshot.hasError) {
+                                              return const Icon(Icons.person);
+                                            } else {
+                                              return CircleAvatar(
+                                                backgroundImage: snapshot.data,
+                                                radius: 10,
+                                              );
+                                            }
+                                          }),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        message.sender,
+                                        style: TextStyle(
+                                            color: isSentByMe
+                                                ? Colors.white
+                                                : Colors.black),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    message.message,
+                                    style: TextStyle(
+                                        color: isSentByMe
+                                            ? Colors.white
+                                            : Colors.black),
+                                  )
+                                ],
                               ),
                             ),
                           ),

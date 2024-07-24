@@ -33,9 +33,10 @@ class CommentScreenState extends State<CommentScreen> {
   }
 
   Future<void> _addComment() async {
+    final currentUser = await DatabaseHelper().getCurrentUser();
     final newComment = Comment(
       postId: widget.post.id!,
-      username: widget.post.username,
+      username: currentUser!.username,
       text: _commentController.text,
       time: DateTime.now().toString(),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/helpers/database_helper.dart';
+import 'package:social_media_app/helpers/hash_helper.dart';
 import 'package:social_media_app/models/user.dart';
 
 class UpdatePasswordScreen extends StatefulWidget {
@@ -42,7 +43,7 @@ class UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
           name: _currentUser!.name,
           bio: _currentUser!.bio,
           email: _currentUser!.email,
-          password: _newPasswordController.text,
+          password: HashHelper.hashPassword(_newPasswordController.text),
           profilePicture: _currentUser!.profilePicture,
         );
         await DatabaseHelper().updateUser(updatedUser);
@@ -87,7 +88,8 @@ class UpdatePasswordScreenState extends State<UpdatePasswordScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your old password';
                           }
-                          if (value != currentUser!.password) {
+                          if (HashHelper.hashPassword(value) !=
+                              currentUser!.password) {
                             return 'Incorrect old password';
                           }
                           return null;

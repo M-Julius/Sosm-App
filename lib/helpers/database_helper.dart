@@ -283,6 +283,7 @@ class DatabaseHelper {
     await db.insert('likes', {'postId': postId, 'userId': currentUser!.id});
     await db.rawUpdate(
         'UPDATE posts SET likeCount = likeCount + 1 WHERE id = ?', [postId]);
+    await isPostLikedByCurrentUser(postId);
   }
 
   Future<void> unlikePost(int postId) async {
@@ -293,6 +294,7 @@ class DatabaseHelper {
         whereArgs: [postId, currentUser!.id]);
     await db.rawUpdate(
         'UPDATE posts SET likeCount = likeCount - 1 WHERE id = ?', [postId]);
+    await isPostLikedByCurrentUser(postId);
   }
 
   Future<bool> isPostLikedByCurrentUser(int postId) async {

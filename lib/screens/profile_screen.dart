@@ -113,131 +113,92 @@ class _ProfileScreenState extends State<ProfileScreen> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
-            return Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        children: [
-                          InkWell(
-                            onTap: _pickImage,
-                            child: FutureBuilder<ImageProvider>(
-                              future: imageAvatar(_user!.username),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const CircularProgressIndicator();
-                                } else if (snapshot.hasError) {
-                                  return const Icon(Icons.error);
-                                } else {
-                                  return CircleAvatar(
-                                    backgroundImage: snapshot.data,
-                                    radius: 50,
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 15),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _user!.name,
-                                  style: const TextStyle(fontSize: 24),
-                                ),
-                                Text(
-                                  _user!.bio,
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                              ],
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: _navigateToUpdateProfile,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
                       children: [
-                        Column(
-                          children: [
-                            const Text(
-                              'Total Followers',
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            Text(
-                              '$_followersCount',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
+                        InkWell(
+                          onTap: _pickImage,
+                          child: FutureBuilder<ImageProvider>(
+                            future: imageAvatar(_user!.username),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return const Icon(Icons.error);
+                              } else {
+                                return CircleAvatar(
+                                  backgroundImage: snapshot.data,
+                                  radius: 50,
+                                );
+                              }
+                            },
+                          ),
                         ),
-                        Column(
-                          children: [
-                            const Text(
-                              'Total Following',
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            Text(
-                              '$_followingCount',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _user!.name,
+                                style: const TextStyle(fontSize: 24),
+                              ),
+                              Text(
+                                _user!.bio,
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: _navigateToUpdateProfile,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    const Divider(),
-                    const SizedBox(height: 20),
-                    InkWell(
-                      onTap: _navigateToUserPosts,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(Icons.post_add),
-                                SizedBox(width: 10),
-                                Text('Posted'),
-                              ],
-                            ),
-                            Icon(Icons.arrow_right, size: 30),
-                          ],
-                        ),
+                  ),
+                  const SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Column(
+                        children: [
+                          const Text(
+                            'Total Followers',
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          Text(
+                            '$_followersCount',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ],
                       ),
-                    ),
-                    InkWell(
-                      onTap: _navigateToUpdatePassword,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(Icons.account_box),
-                                SizedBox(width: 10),
-                                Text('Account'),
-                              ],
-                            ),
-                            Icon(Icons.arrow_right, size: 30),
-                          ],
-                        ),
+                      Column(
+                        children: [
+                          const Text(
+                            'Total Following',
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          Text(
+                            '$_followingCount',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ],
                       ),
-                    ),
-                    Container(
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  const Divider(),
+                  const SizedBox(height: 20),
+                  InkWell(
+                    onTap: _navigateToUserPosts,
+                    child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 10),
                       child: const Row(
@@ -245,39 +206,76 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.settings),
+                              Icon(Icons.post_add),
                               SizedBox(width: 10),
-                              Text('Setting'),
+                              Text('Posted'),
                             ],
                           ),
                           Icon(Icons.arrow_right, size: 30),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    const Divider(),
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushNamedAndRemoveUntil(
-                              context, '/', (route) => false);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size.fromHeight(50),
-                          maximumSize: const Size.fromHeight(50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                  ),
+                  InkWell(
+                    onTap: _navigateToUpdatePassword,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.account_box),
+                              SizedBox(width: 10),
+                              Text('Account'),
+                            ],
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                        ),
-                        child: const Text('Logout'),
+                          Icon(Icons.arrow_right, size: 30),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.settings),
+                            SizedBox(width: 10),
+                            Text('Setting'),
+                          ],
+                        ),
+                        Icon(Icons.arrow_right, size: 30),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Divider(),
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, '/', (route) => false);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(50),
+                        maximumSize: const Size.fromHeight(50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                      ),
+                      child: const Text('Logout'),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
               ),
             );
           }

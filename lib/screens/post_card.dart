@@ -42,7 +42,6 @@ class _PostCardState extends State<PostCard> {
       time: DateTime.now().toString(),
     );
 
-    print(newPost);
     await DatabaseHelper().insertPost(newPost);
     widget.onPostCreated();
     _textController.clear();

@@ -20,7 +20,6 @@ class LoginScreenState extends State<LoginScreen> {
     final user = await DatabaseHelper().getUserByEmail(email);
     final hashedPassword = HashHelper.hashPassword(password);
 
-
     if (user != null && user.password == hashedPassword) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('currentUserEmail', email);

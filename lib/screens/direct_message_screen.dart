@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_app/helpers/database_helper.dart';
+import 'package:social_media_app/helpers/image.dart';
 import 'package:social_media_app/models/message.dart';
 import 'package:social_media_app/screens/chat_screen.dart';
 
@@ -51,10 +52,18 @@ class DirectMessageScreenState extends State<DirectMessageScreen> {
           final user = users[index];
           final lastMessage = userMessages[user]?.last;
           return ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.blue,
-              child: Text(user[0]),
-            ),
+            leading: FutureBuilder(
+                future: imageAvatar(user),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return CircleAvatar(
+                      backgroundImage: snapshot.data as ImageProvider,
+                      radius: 20,
+                    );
+                  } else {
+                    return const CircleAvatar();
+                  }
+                }),
             title: Text(user),
             subtitle: Text(lastMessage?.message ?? 'No messages yet'),
             trailing: const Icon(Icons.chevron_right),
