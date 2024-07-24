@@ -37,30 +37,3 @@ This is a simple social media app built with Flutter and SQLite for local databa
    ```bash
    flutter run
    ```
-
-### Project Structure
-```lib/
-├── db/
-│   └── database_helper.dart
-├── models/
-│   ├── comment.dart
-│   ├── post.dart
-│   └── user.dart
-├── screens/
-│   ├── chat_screen.dart
-│   ├── comment_screen.dart
-│   ├── direct_message_screen.dart
-│   ├── group_screen.dart
-│   ├── home_screen.dart
-│   ├── login_screen.dart
-│   ├── profile_screen.dart
-│   ├── register_screen.dart
-│   ├── timeline_screen.dart
-│   ├── update_password_screen.dart
-│   ├── update_profile_screen.dart
-│   └── user_posts_screen.dart
-├── widgets/
-│   ├── post_widget.dart
-│   └── post_card.dart
-└── main.dart
-```
