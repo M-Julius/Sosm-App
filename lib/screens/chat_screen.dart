@@ -1,56 +1,99 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
+import 'package:social_media_app/models/user.dart';
+import 'package:social_media_app/models/message.dart';
+import 'package:social_media_app/helpers/database_helper.dart';
 
-class ChatScreen extends StatelessWidget {
-  final String username;
+class ChatScreen extends StatefulWidget {
+  final String chatUser;
 
-  const ChatScreen({super.key, required this.username});
+  const ChatScreen({super.key, required this.chatUser});
+
+  @override
+  ChatScreenState createState() => ChatScreenState();
+}
+
+class ChatScreenState extends State<ChatScreen> {
+  final TextEditingController _messageController = TextEditingController();
+  List<Message> messages = [];
+  late User _currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchMessages();
+  }
+
+  Future<void> _fetchMessages() async {
+    final currentUser = await DatabaseHelper().getCurrentUser();
+
+    setState(() {
+      _currentUser = currentUser!;
+    });
+    final fetchedMessages =
+        await DatabaseHelper().getMessages(currentUser!.username);
+    setState(() {
+      messages = fetchedMessages
+          .where((msg) =>
+              (msg.sender == currentUser.username &&
+                  msg.receiver == widget.chatUser) ||
+              (msg.sender == widget.chatUser &&
+                  msg.receiver == currentUser.username))
+          .toList();
+    });
+  }
+
+  Future<void> _sendMessage() async {
+    final messageText = _messageController.text;
+    if (messageText.isNotEmpty) {
+      final newMessage = Message(
+        sender: _currentUser.username,
+        receiver: widget.chatUser,
+        message: messageText,
+        timestamp: DateTime.now().toString(),
+      );
+      await DatabaseHelper().insertMessage(newMessage);
+      _messageController.clear();
+      _fetchMessages();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat with $username'),
+        title: Text('Chat with ${widget.chatUser}'),
       ),
       body: Column(
         children: [
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ListView(
-                children: [
-                  ChatBubble(
-                    clipper: ChatBubbleClipper1(type: BubbleType.sendBubble),
-                    alignment: Alignment.topRight,
-                    margin: const EdgeInsets.only(top: 20),
-                    backGroundColor: Colors.blue,
-                    child: Container(
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.7,
-                      ),
-                      child: const Text(
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                        style: TextStyle(color: Colors.white),
-                      ),
+            child: ListView.builder(
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final message = messages[index];
+                final isCurrentUser = message.sender == _currentUser.username;
+                return ChatBubble(
+                  clipper: ChatBubbleClipper1(
+                      type: isCurrentUser
+                          ? BubbleType.sendBubble
+                          : BubbleType.receiverBubble),
+                  alignment:
+                      isCurrentUser ? Alignment.topRight : Alignment.topLeft,
+                  margin: const EdgeInsets.only(top: 20),
+                  backGroundColor:
+                      isCurrentUser ? Colors.blue : const Color(0xffE7E7ED),
+                  child: Container(
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.7,
+                    ),
+                    child: Text(
+                      message.message,
+                      style: TextStyle(
+                          color: isCurrentUser ? Colors.white : Colors.black),
                     ),
                   ),
-                  ChatBubble(
-                    clipper:
-                        ChatBubbleClipper1(type: BubbleType.receiverBubble),
-                    backGroundColor: const Color(0xffE7E7ED),
-                    margin: const EdgeInsets.only(top: 20),
-                    child: Container(
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.7,
-                      ),
-                      child: const Text(
-                        "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat",
-                        style: TextStyle(color: Colors.black),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                );
+              },
             ),
           ),
           Container(
@@ -64,9 +107,10 @@ class ChatScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: TextField(
-                    decoration: InputDecoration(
+                    controller: _messageController,
+                    decoration: const InputDecoration(
                       hintText: 'Type a message',
                       border: InputBorder.none,
                     ),
@@ -74,7 +118,7 @@ class ChatScreen extends StatelessWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.send),
-                  onPressed: () {},
+                  onPressed: _sendMessage,
                 ),
               ],
             ),

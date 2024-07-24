@@ -1,20 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:social_media_app/helpers/database_helper.dart';
+import 'package:social_media_app/helpers/format_helper.dart';
+import 'package:social_media_app/helpers/image.dart';
 import 'package:social_media_app/models/comment.dart';
 import 'package:social_media_app/models/post.dart';
 import 'package:social_media_app/widgets/post_widget.dart';
 
-class CommentScreen extends StatelessWidget {
+class CommentScreen extends StatefulWidget {
   final Post post;
-  final List<Comment> comment = [
-    Comment(
-        username: 'John Doe',
-        text: 'Greats looks like me',
-        time: '10 minutes ago'),
-    Comment(username: 'Abdul', text: 'Nice post John', time: '1 hours ago'),
-    Comment(username: 'Jane', text: 'I want to!', time: '1 hours ago'),
-  ];
 
-  CommentScreen({super.key, required this.post});
+  const CommentScreen({super.key, required this.post});
+
+  @override
+  CommentScreenState createState() => CommentScreenState();
+}
+
+class CommentScreenState extends State<CommentScreen> {
+  final TextEditingController _commentController = TextEditingController();
+  List<Comment> _comments = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchComments();
+  }
+
+  Future<void> _fetchComments() async {
+    final comments = await DatabaseHelper().getComments(widget.post.id!);
+    setState(() {
+      _comments = comments;
+    });
+  }
+
+  Future<void> _addComment() async {
+    final newComment = Comment(
+      postId: widget.post.id!,
+      username: widget.post.username,
+      text: _commentController.text,
+      time: DateTime.now().toString(),
+    );
+    await DatabaseHelper().insertComment(newComment);
+    _commentController.clear();
+    _fetchComments();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +54,12 @@ class CommentScreen extends StatelessWidget {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: comment.length + 1,
+              itemCount: _comments.length + 1,
               itemBuilder: (context, index) {
                 if (index == 0) {
-                  return postWidget(post, context, isDetail: true);
+                  return postWidget(widget.post, context, isDetail: true);
                 }
-                return CommentWidget(comment: comment[index - 1]);
+                return CommentWidget(comment: _comments[index - 1]);
               },
             ),
           ),
@@ -41,9 +69,10 @@ class CommentScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: TextField(
-                    decoration: InputDecoration(
+                    controller: _commentController,
+                    decoration: const InputDecoration(
                       hintText: 'Add a comment...',
                     ),
                   ),
@@ -51,14 +80,7 @@ class CommentScreen extends StatelessWidget {
 
                 // Button to post the comment
                 IconButton(
-                  onPressed: () {
-                    // show message
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Comment posted'),
-                      ),
-                    );
-                  },
+                  onPressed: _addComment,
                   icon: const Icon(Icons.send),
                 ),
               ],
@@ -87,10 +109,20 @@ class CommentWidget extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const CircleAvatar(
-                    radius: 15,
-                    backgroundImage: NetworkImage(
-                        'https://cdn3.iconfinder.com/data/icons/vector-icons-6/96/256-1024.png'),
+                  FutureBuilder<ImageProvider>(
+                    future: imageAvatar(comment.username),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return const Icon(Icons.error);
+                      } else {
+                        return CircleAvatar(
+                          backgroundImage: snapshot.data,
+                          radius: 20,
+                        );
+                      }
+                    },
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -100,7 +132,7 @@ class CommentWidget extends StatelessWidget {
                 ],
               ),
               Text(
-                comment.time,
+                formatTimeDifference(comment.time),
                 style: const TextStyle(color: Colors.grey),
               ),
             ],

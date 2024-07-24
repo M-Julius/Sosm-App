@@ -1,46 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:social_media_app/helpers/database_helper.dart';
+import 'package:social_media_app/helpers/image.dart';
 import 'package:social_media_app/models/post.dart';
+import 'package:social_media_app/models/user.dart';
 import 'package:social_media_app/screens/chat_screen.dart';
+import 'package:social_media_app/screens/followers_screen.dart';
+import 'package:social_media_app/screens/following_screen.dart';
 import 'package:social_media_app/widgets/post_widget.dart';
 
 class UserScreen extends StatefulWidget {
-  const UserScreen({super.key});
+  final String username;
+  const UserScreen({super.key, required this.username});
 
   @override
   State<UserScreen> createState() => _UserScreenState();
 }
 
 class _UserScreenState extends State<UserScreen> {
-  final List<Post> posts = [
-    Post(
-        username: 'John Doe',
-        profilePicture:
-            'https://cdn3.iconfinder.com/data/icons/vector-icons-6/96/256-1024.png',
-        state: 'Active',
-        content: 'This is my first post!',
-        image:
-            'https://contentoo.com/wp-content/uploads/2023/04/Content-creation-V1-e1680617593807.png',
-        time: '1 hours'),
-    Post(
-        username: 'John Doe',
-        profilePicture:
-            'https://cdn3.iconfinder.com/data/icons/vector-icons-6/96/256-1024.png',
-        state: 'Inactive',
-        content: 'This is my second post!',
-        time: '7 hours'),
-    Post(
-        username: 'John Doe',
-        profilePicture:
-            'https://cdn3.iconfinder.com/data/icons/vector-icons-6/96/256-1024.png',
-        state: 'Active',
-        content: 'This is my third post!',
-        image:
-            'https://contentoo.com/wp-content/uploads/2023/04/Content-creation-V1-e1680617593807.png',
-        time: '7 hours'),
-  ];
+  User? user;
+  List<Post> posts = [];
+  int _followersCount = 0;
+  int _followingCount = 0;
+  bool _isFollowing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserAndPosts();
+  }
+
+  Future<void> _fetchUserAndPosts() async {
+    final fetchedUser =
+        await DatabaseHelper().getUserByUsername(widget.username);
+    final currentUser = await DatabaseHelper().getCurrentUser();
+
+    if (fetchedUser != null) {
+      final fetchedPosts =
+          await DatabaseHelper().getPostsByUser(fetchedUser.username);
+      final followers = await DatabaseHelper().getFollowers(fetchedUser.id!);
+      final following = await DatabaseHelper().getFollowing(fetchedUser.id!);
+      final isFollowing =
+          await DatabaseHelper().isFollowing(fetchedUser.id!, currentUser!.id!);
+
+      setState(() {
+        user = fetchedUser;
+        posts = fetchedPosts;
+        _followersCount = followers.length;
+        _followingCount = following.length;
+        _isFollowing = isFollowing;
+      });
+    }
+  }
+
+  Future<void> _toggleFollow() async {
+    if (user != null) {
+      final currentUser = await DatabaseHelper().getCurrentUser();
+      await DatabaseHelper().toggleFollow(
+        currentUser!.id!,
+        user!.id!,
+      );
+      _fetchUserAndPosts();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('User'),
@@ -48,25 +78,35 @@ class _UserScreenState extends State<UserScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: NetworkImage(
-                        'https://cdn3.iconfinder.com/data/icons/vector-icons-6/96/256-1024.png'),
+                  FutureBuilder<ImageProvider>(
+                    future: imageAvatar(user!.username),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return const Icon(Icons.error);
+                      } else {
+                        return CircleAvatar(
+                          backgroundImage: snapshot.data,
+                          radius: 50,
+                        );
+                      }
+                    },
                   ),
-                  SizedBox(width: 15),
+                  const SizedBox(width: 15),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       textDirection: TextDirection.ltr,
                       children: [
-                        Text('John Doe', style: TextStyle(fontSize: 24)),
+                        Text(user!.name, style: const TextStyle(fontSize: 24)),
                         Text(
-                          '''Helo, I am John Doe, Software Engineer''',
-                          style: TextStyle(fontSize: 16),
+                          user!.bio,
+                          style: const TextStyle(fontSize: 16),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 3,
                           textAlign: TextAlign.left,
@@ -78,32 +118,54 @@ class _UserScreenState extends State<UserScreen> {
               ),
             ),
             const SizedBox(height: 30),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Column(
-                  children: [
-                    Text(
-                      'Total Followers',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    Text(
-                      '100',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ],
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            FollowersScreen(userId: user!.id!),
+                      ),
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Total Followers',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      Text(
+                        '$_followersCount',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
                 ),
-                Column(
-                  children: [
-                    Text(
-                      'Total Following',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    Text(
-                      '150',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ],
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            FollowingScreen(userId: user!.id!),
+                      ),
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Total Following',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      Text(
+                        '$_followingCount',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -114,27 +176,27 @@ class _UserScreenState extends State<UserScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: _toggleFollow,
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 30),
                     ),
-                    label: const Text('Follow'),
-                    icon: const Icon(Icons.add),
+                    label: Text(_isFollowing ? 'Unfollow' : 'Follow'),
+                    icon: Icon(_isFollowing ? Icons.remove : Icons.add),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      // navigate to direct screen
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              const ChatScreen(username: 'John Doe'),
+                          builder: (context) => ChatScreen(
+                            chatUser: user!.username,
+                          ),
                         ),
                       );
                     },

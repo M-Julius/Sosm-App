@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:social_media_app/helpers/database_helper.dart';
 import 'package:social_media_app/screens/profile_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
 
-/* UTS Pemrograman android
-- M. Julius Saputra - 411211062
-- Andika Guruh Topandi - 411211046
-- Dani Basse - 411211051
-*/
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final dbHelper = DatabaseHelper();
+  await dbHelper.onDeleteDatabase(); // Ensure database is reset
+  await dbHelper.database; // Ensure database is initialized
 
-void main() {
   runApp(const SocialMediaApp());
 }
 
